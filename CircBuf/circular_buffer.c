@@ -1,12 +1,13 @@
 /**
- * @file circular_buffer.c
- * @brief
- * @author Mark Xu<ChuiXiao.Xu@agilex.ai>
+ * @file    circular_buffer.c
+ * @brief   circular buffer
+ * @author  Mark Xu<scmarxx@gmail.com>
  * @version 1
- * @date 2018-08-01
+ * @date    2018-08-01
  */
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "circular_buffer.h"
 
 /**
@@ -16,7 +17,7 @@
  *
  * @return          1 if Num is power of 2
  */
-unsigned int IsPowerOf2(unsigned int Num)
+unsigned long long IsPowerOf2(unsigned long long Num)
 {
     return (Num > 0 && !(Num & (Num - 1)));
 }
@@ -34,6 +35,8 @@ unsigned long RoundUp_PowerOf2(unsigned long Num)
 
     if (IsPowerOf2(Num) || Num == 0)
         return Num;
+    else if (Num > LONG_MAX)
+        return (LONG_MAX ^ ULONG_MAX);   // WARN: if Num biger than (LONG_MAX+1) then result will equals to (LONG_MAX+1)
 
     while (Num)
     {
@@ -41,7 +44,7 @@ unsigned long RoundUp_PowerOf2(unsigned long Num)
         result <<= 1;
     }
 
-    return result;   // WARN: if Num biger than 0x8000 0000 0000 0000 then result will equals to 0
+    return result;
 }
 
 /**
@@ -59,10 +62,10 @@ int CircBuf_Alloc(CircBuf_t *CBuf, unsigned int Size)
 
     if(!IsPowerOf2(Size))
     {
-        if(Size >= 0x80000000)
-            Size = 0x80000000;
+        if(Size > INT_MAX)
+            Size = (INT_MAX ^ UINT_MAX);
         else
-            Size = RoundUp_PowerOf2(Size);
+            Size = (int)RoundUp_PowerOf2(Size);
     }
     CBuf->Buffer = (unsigned char *) calloc(Size, sizeof(char));    // Buffer will set to 0
 
@@ -83,7 +86,7 @@ int CircBuf_Alloc(CircBuf_t *CBuf, unsigned int Size)
  *
  * @param[in] CBuf  the circular buffer to delete
  */
-void CircBuf_Delete(CircBuf_t *CBuf)
+void CircBuf_Free(CircBuf_t *CBuf)
 {
     free(CBuf->Buffer);
     CBuf = NULL;
@@ -94,24 +97,24 @@ void CircBuf_Delete(CircBuf_t *CBuf)
  *
  * @param[in] CBuf      the circular buffer that will store the data
  * @param[in] data      the data to store into circular buffer
- * @param[in] LenToPut  the length of data to store into circular buffer
+ * @param[in] LenToPush  the length of data to store into circular buffer
  *
  * @return      the actual size stored into circular buffer
  */
-unsigned int CircBuf_Put(CircBuf_t *CBuf, unsigned char *data, unsigned int LenToPut)
+unsigned int CircBuf_Push(CircBuf_t *CBuf, unsigned char *data, unsigned int LenToPush)
 {
     unsigned int len;
 
-    LenToPut = MIN(LenToPut, (CBuf->Size - (CBuf->Header - CBuf->Tailer)));
+    LenToPush = MIN(LenToPush, (CBuf->Size - (CBuf->Header - CBuf->Tailer)));
 
-    len = MIN(LenToPut, CBuf->Size - (CBuf->Header & (CBuf->Size - 1)));
+    len = MIN(LenToPush, CBuf->Size - (CBuf->Header & (CBuf->Size - 1)));
 
     memcpy(CBuf->Buffer + (CBuf->Header & CBuf->Size - 1), data, len);
-    memcpy(CBuf->Buffer, data+len, LenToPut - len);
+    memcpy(CBuf->Buffer, data+len, LenToPush - len);
 
-    CBuf->Header += LenToPut;
+    CBuf->Header += LenToPush;
 
-    return LenToPut;
+    return LenToPush;
 }
 
 /**
@@ -119,24 +122,24 @@ unsigned int CircBuf_Put(CircBuf_t *CBuf, unsigned char *data, unsigned int LenT
  *
  * @param[in] CBuf      the circular buffer that stored data
  * @param[in] data      target buffer that will store the data that from circular buffer
- * @param[in] LenToGet  the length that wan't to get from circular buffer
+ * @param[in] LenToPop  the length that wan't to get from circular buffer
  *
  * @return      actual length that get from circular buffer
  */
-unsigned int CircBuf_Get(CircBuf_t *CBuf, unsigned char *data, unsigned int LenToGet)
+unsigned int CircBuf_Pop(CircBuf_t *CBuf, unsigned char *data, unsigned int LenToPop)
 {
     unsigned int len;
 
-    LenToGet = MIN(LenToGet, CBuf->Header - CBuf->Tailer);
+    LenToPop = MIN(LenToPop, CBuf->Header - CBuf->Tailer);
 
-    len = MIN(LenToGet, CBuf->Size - (CBuf->Tailer & (CBuf->Size - 1)));
+    len = MIN(LenToPop, CBuf->Size - (CBuf->Tailer & (CBuf->Size - 1)));
 
     memcpy(data, CBuf->Buffer + (CBuf->Tailer & (CBuf->Size - 1)), len);
-    memcpy(data + len, CBuf->Buffer, LenToGet - len);
+    memcpy(data + len, CBuf->Buffer, LenToPop - len);
 
-    CBuf->Tailer += LenToGet;
+    CBuf->Tailer += LenToPop;
 
-    return LenToGet;
+    return LenToPop;
 }
 
 /**
@@ -147,9 +150,9 @@ unsigned int CircBuf_Get(CircBuf_t *CBuf, unsigned char *data, unsigned int LenT
  *
  * @return              actual length that get from circular buffer
  */
-unsigned int CircBuf_GetOneChar(CircBuf_t *CBuf, unsigned char *data)
+unsigned int CircBuf_PopOneChar(CircBuf_t *CBuf, unsigned char *data)
 {
-    return CircBuf_Get(CBuf, data, 1);
+    return CircBuf_Pop(CBuf, data, 1);
 }
 
 /**
