@@ -31,6 +31,7 @@ unsigned int CircBuf_Push (CircBuf_t *CBuf, unsigned char *data, unsigned int Le
 unsigned int CircBuf_Pop  (CircBuf_t *CBuf, unsigned char *data, unsigned int LenToPop);
 unsigned int CircBuf_PopOneChar (CircBuf_t *CBuf, unsigned char *data);
 unsigned char CircBuf_At(CircBuf_t *CBuf, unsigned int offset);
+void         CircBuf_Drop(CircBuf_t *CBuf, unsigned int LenToDrop);
 unsigned int CircBuf_GetAvalaibleSize (CircBuf_t *CBuf);
 unsigned int CircBuf_GetUsedSize (CircBuf_t *CBuf);
 unsigned int CircBuf_IsEmpty (CircBuf_t *CBuf);

@@ -169,6 +169,18 @@ unsigned char CircBuf_At(CircBuf_t *CBuf, unsigned int offset)
     return CBuf->Buffer[index];
 }
 
+
+/**
+ * @brief     drop the the size of data at tailer
+ *
+ * @param[in] CBuf          the circular buffer that stored data
+ * @param[in] LenToDrop     the size of data at tailer of circular_buffer to drop
+ */
+void CircBuf_Drop(CircBuf_t *CBuf, unsigned int LenToDrop)
+{
+    CBuf->Tailer += LenToDrop;
+}
+
 /**
  * @brief     get the Available memery size of circular buffer
  *
