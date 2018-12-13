@@ -156,6 +156,20 @@ unsigned int CircBuf_PopOneChar(CircBuf_t *CBuf, unsigned char *data)
 }
 
 /**
+ * @brief     for access data at Tailer + offset
+ *
+ * @param[in] CBuf      the circular buffer that stored data
+ * @param[in] offset    the offset of Tailer
+ *
+ * @return              the data at Buffer[Tailer + offset]
+ */
+unsigned char CircBuf_At(CircBuf_t *CBuf, unsigned int offset)
+{
+    unsigned int index = (CBuf->Tailer + offset) & (CBuf->Size - 1);
+    return CBuf->Buffer[index];
+}
+
+/**
  * @brief     get the Available memery size of circular buffer
  *
  * @param[in] CBuf  the circular buffer to get size

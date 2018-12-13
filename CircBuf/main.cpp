@@ -19,7 +19,7 @@ static long Counter1 = 0, Counter2 = 0, Counter3 = 0;
 
 void GenRandString(char *buf, int maxsize)
 {
-    srand(Counter1);
+    srand(Counter1++);
 
     for (int i = 0; i < maxsize-1; i++)
     {
@@ -30,7 +30,7 @@ void GenRandString(char *buf, int maxsize)
 
 void GenRandNum(char *buf, int maxsize)
 {
-    srand(Counter1);
+    srand(Counter1++);
 
     for (int i = 0; i < maxsize - 1; i++)
     {
