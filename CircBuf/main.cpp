@@ -106,76 +106,11 @@ int readbuf(CircBuf_t *CBuf)
     }
     return 0;
 }
-#if 0
-#define MAX_COUNT 0x800
-#define TEST_COUNT 40960
-
-int main(int argc, char *argv[])
-{
-    long i = 0;
-    unsigned char c = 0;
-    map<long, unsigned char> TestMap;
-    chrono::steady_clock::time_point Start = chrono::steady_clock::now();
-    printf("Creating Map: %d element\n", MAX_COUNT);
-    srand((unsigned)Start.max);
-
-
-    for (i = 0; i < MAX_COUNT; i++)
-    {
-        c = i & 0xff;
-        TestMap[i] = c;
-    }
-    auto Elapsed = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - Start).count();
-    printf("Create Map elapsed %lld ms\n", Elapsed);
-    vector<long long> ElapsedTimes;
-    long long tmp = 0;
-
-    auto End = chrono::steady_clock::now();
-    auto AvgElapsed = Elapsed;
-    long rnd = 0;
-    AvgElapsed = 0;
-
-   for (int j = 0; j < TEST_COUNT; j++)
-    {
-
-       rnd = rand()*150;
-       rnd &= MAX_COUNT - 1;
-
-        Start = chrono::steady_clock::now();
-        auto it = TestMap.find(rnd);
-        End = chrono::steady_clock::now();
-        Elapsed = chrono::duration_cast<chrono::nanoseconds>(End - Start).count();
-
-        AvgElapsed += Elapsed;
-        if (it != TestMap.end())
-            printf("Found: [% 9d, 0x%02X], in % 7lld ns\n", it->first, it->second, Elapsed);
-    }
-    printf("Average Elapsed(find): %lld ns, TestCount %d\n\n", AvgElapsed / TEST_COUNT, TEST_COUNT);
-    unsigned char tmp1 = 0;
-    AvgElapsed = 0;
-    for (int j = 0; j < TEST_COUNT; j++)
-    {
-
-        rnd = rand() * 150;
-        rnd &= MAX_COUNT - 1;
-
-        Start = chrono::steady_clock::now();
-        tmp1 = TestMap[rnd];
-        End = chrono::steady_clock::now();
-        Elapsed = chrono::duration_cast<chrono::nanoseconds>(End - Start).count();
-
-        AvgElapsed += Elapsed;
-        printf("Found: [% 9d, 0x%02X], in % 7lld ns\n", rnd, tmp1, Elapsed);
-    }
-    printf("Average Elapsed([]): %lld ns, TestCount %d\n", AvgElapsed / TEST_COUNT, TEST_COUNT);
-    //system("pause");
-    return 0;
-}
-#endif
 
 #if 1
 int main(int argc, char *argv[])
 {
+    unsigned char buffer[300] = { 0 };
     CircBuf_t CBuf;
 
     printf("RoundUp_PowerOf2:\n%u: %u\n%u: %d\n%u: %d\n",
@@ -184,8 +119,8 @@ int main(int argc, char *argv[])
         (unsigned long)ULONG_MAX, RoundUp_PowerOf2(ULONG_MAX)
         );
 
-
-    CircBuf_Alloc(&CBuf, 20 * 1024);
+    CircBuf_Init(&CBuf, buffer, 300);
+    //CircBuf_Alloc(&CBuf, 20 * 1024);
     printf("Size: %d, 0x%0x\n", CBuf.Size, CBuf.Size);
 
     /**/

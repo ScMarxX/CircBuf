@@ -25,6 +25,9 @@ typedef struct CIRC_BUF
 
 unsigned long long IsPowerOf2 (unsigned long long Num);
 unsigned long RoundUp_PowerOf2 (unsigned long Num);
+unsigned long RoundDown_PowerOf2(unsigned long Num);
+
+int          CircBuf_Init(CircBuf_t *CBuf, unsigned char *Buff, unsigned int Size);
 int          CircBuf_Alloc (CircBuf_t *CBuf, unsigned int Size);
 void         CircBuf_Free (CircBuf_t *CBuf);
 unsigned int CircBuf_Push (CircBuf_t *CBuf, unsigned char *data, unsigned int LenToPush);

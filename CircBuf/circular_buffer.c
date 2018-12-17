@@ -2,7 +2,7 @@
  * @file    circular_buffer.c
  * @brief   circular buffer
  * @author  Mark Xu<scmarxx@gmail.com>
- * @version 1.1
+ * @version 1.2
  * @date    2018-08-01
  */
 #include <stdlib.h>
@@ -45,6 +45,59 @@ unsigned long RoundUp_PowerOf2(unsigned long Num)
     }
 
     return result;
+}
+
+/**
+ * @brief     calculate the minimum number that round down to the next power of 2
+ *
+ * @param[] Num the number to check
+ *
+ * @return    the number that round up to the last power of 2 (4 if Num is 5,6,7, 8 if Num is 9,10,11 ... )
+ */
+unsigned long RoundDown_PowerOf2(unsigned long Num)
+{
+    unsigned long result = 1;
+
+    if (IsPowerOf2(Num) || Num == 0)
+        return Num;
+    else if (Num > LONG_MAX)
+        return (LONG_MAX ^ ULONG_MAX);   // WARN: if Num biger than (LONG_MAX+1) then result will equals to (LONG_MAX+1)
+
+    while (Num)
+    {
+        Num >>= 1;
+        result <<= 1;
+    }
+
+    return result >> 1;
+}
+
+/**
+ * @brief     Init the Circular buffer with a array
+ *
+ * @param[in] CBuf      The circular buffer to initial
+ * @param[in] Buff      the buffer for circular buffer to store data
+ * @param[in] Size      the size of buffer
+ *
+ * @return      the Round Down(Power Of 2) size that the circular  buffer to be used
+ */
+int CircBuf_Init(CircBuf_t *CBuf, unsigned char *Buff, unsigned int Size)
+{
+    CBuf->Buffer = Buff;
+
+    if(!IsPowerOf2(Size))
+    {
+        if (Size > INT_MAX)
+            Size = (INT_MAX ^ UINT_MAX);
+        else
+            Size = (int) RoundDown_PowerOf2(Size);
+    }
+
+    CBuf->Size = Size;
+    CBuf->Tailer = 0;
+    CBuf->Header = 0;
+
+    return Size;
 }
 
 /**
