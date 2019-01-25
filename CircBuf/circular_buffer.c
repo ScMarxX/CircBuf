@@ -231,7 +231,10 @@ unsigned char CircBuf_At(CircBuf_t *CBuf, unsigned int offset)
  */
 void CircBuf_Drop(CircBuf_t *CBuf, unsigned int LenToDrop)
 {
-    CBuf->Tailer += LenToDrop;
+    if((CBuf->Tailer + LenToDrop) <= CBuf->Header )
+        CBuf->Tailer += LenToDrop;
+    else
+        CBuf->Tailer = CBuf->Header;
 }
 
 /**
