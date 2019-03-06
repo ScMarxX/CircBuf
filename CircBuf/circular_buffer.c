@@ -222,6 +222,28 @@ unsigned char CircBuf_At(CircBuf_t *CBuf, unsigned int offset)
     return CBuf->Buffer[index];
 }
 
+/**
+ * @brief     get data from circular buffer
+ *
+ * @param[in] CBuf      the circular buffer that stored data
+ * @param[in] data      target buffer that will store the data that from circular buffer
+ * @param[in] LenToRead  the length that wan't to get from circular buffer
+ *
+ * @return      actual length that get from circular buffer
+ */
+unsigned int CircBuf_Read(CircBuf_t *CBuf, unsigned char *data, unsigned int LenToRead)
+{
+    unsigned int len;
+
+    LenToRead = MIN(LenToRead, CBuf->Header - CBuf->Tailer);
+
+    len = MIN(LenToRead, CBuf->Size - (CBuf->Tailer & (CBuf->Size - 1)));
+
+    memcpy(data, CBuf->Buffer + (CBuf->Tailer & (CBuf->Size - 1)), len);
+    memcpy(data + len, CBuf->Buffer, LenToRead - len);
+
+    return LenToRead;
+}
 
 /**
  * @brief     drop the the size of data at tailer
