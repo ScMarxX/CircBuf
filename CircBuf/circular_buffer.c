@@ -2,7 +2,7 @@
  * @file    circular_buffer.c
  * @brief   circular buffer
  * @author  Mark Xu<scmarxx@gmail.com>
- * @version 1.2
+ * @version 1.3
  * @date    2018-08-01
  */
 #include <stdlib.h>
